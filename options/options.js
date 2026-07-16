@@ -1,0 +1,146 @@
+const CITIES = {
+  Islamabad: { lat: 33.6995, lng: 73.0363, timezone: 5 },
+  Karachi: { lat: 24.8607, lng: 67.0011, timezone: 5 },
+  Lahore: { lat: 31.5204, lng: 74.3587, timezone: 5 },
+  Peshawar: { lat: 34.0151, lng: 71.5249, timezone: 5 },
+  Quetta: { lat: 30.1798, lng: 66.975, timezone: 5 },
+  Riyadh: { lat: 24.7136, lng: 46.6753, timezone: 3 },
+  Jeddah: { lat: 21.4858, lng: 39.1925, timezone: 3 },
+  Mecca: { lat: 21.3891, lng: 39.8579, timezone: 3 },
+  Medina: { lat: 24.5247, lng: 39.5691, timezone: 3 },
+  Dubai: { lat: 25.2048, lng: 55.2708, timezone: 4 },
+  'Abu Dhabi': { lat: 24.4539, lng: 54.3773, timezone: 4 },
+  Istanbul: { lat: 41.0082, lng: 28.9784, timezone: 3 },
+  Cairo: { lat: 30.0444, lng: 31.2357, timezone: 2 },
+  'Kuala Lumpur': { lat: 3.139, lng: 101.6869, timezone: 8 },
+  Jakarta: { lat: -6.2088, lng: 106.8456, timezone: 7 },
+  London: { lat: 51.5074, lng: -0.1278, timezone: 0 },
+  'New York': { lat: 40.7128, lng: -74.006, timezone: -5 },
+  Toronto: { lat: 43.6532, lng: -79.3832, timezone: -5 },
+};
+
+const DEFAULT_SETTINGS = {
+  city: 'Islamabad',
+  lat: 33.6995,
+  lng: 73.0363,
+  method: 'Karachi',
+  asr: 'Hanafi',
+  maghrib: '4 min',
+  timezone: 5,
+  notifications: true,
+  notifyMinutes: 10,
+  theme: 'system',
+  transparency: 100,
+};
+
+const form = document.getElementById('settings-form');
+const citySelect = document.getElementById('city');
+const customCoords = document.getElementById('custom-coords');
+const latInput = document.getElementById('lat');
+const lngInput = document.getElementById('lng');
+const timezoneInput = document.getElementById('timezone');
+const methodSelect = document.getElementById('method');
+const asrSelect = document.getElementById('asr');
+const maghribSelect = document.getElementById('maghrib');
+const notificationsCheckbox = document.getElementById('notifications');
+const notifyMinutesSelect = document.getElementById('notify-minutes');
+const themeSelect = document.getElementById('theme');
+const transparencyInput = document.getElementById('transparency');
+const transparencyValue = document.getElementById('transparency-value');
+const saveStatus = document.getElementById('save-status');
+
+function applyTheme(theme) {
+  if (theme === 'system') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+}
+
+function showStatus(message) {
+  saveStatus.textContent = message;
+  saveStatus.classList.add('visible');
+  setTimeout(() => saveStatus.classList.remove('visible'), 2000);
+}
+
+function toggleCustomCoords() {
+  const isCustom = citySelect.value === 'Custom';
+  customCoords.hidden = !isCustom;
+}
+
+async function loadSettings() {
+  const stored = await chrome.storage.sync.get('settings');
+  const settings = { ...DEFAULT_SETTINGS, ...(stored.settings || {}) };
+
+  const isKnownCity = CITIES[settings.city];
+  if (isKnownCity) {
+    citySelect.value = settings.city;
+  } else {
+    citySelect.value = 'Custom';
+    latInput.value = settings.lat;
+    lngInput.value = settings.lng;
+    timezoneInput.value = settings.timezone;
+  }
+
+  toggleCustomCoords();
+
+  methodSelect.value = settings.method;
+  asrSelect.value = settings.asr;
+  maghribSelect.value = settings.maghrib;
+  notificationsCheckbox.checked = settings.notifications;
+  notifyMinutesSelect.value = String(settings.notifyMinutes);
+  themeSelect.value = settings.theme || 'system';
+  applyTheme(settings.theme || 'system');
+  transparencyInput.value = settings.transparency || 100;
+  transparencyValue.textContent = `${settings.transparency || 100}%`;
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  let lat, lng, timezone, city;
+
+  if (citySelect.value === 'Custom') {
+    city = 'Custom';
+    lat = parseFloat(latInput.value);
+    lng = parseFloat(lngInput.value);
+    timezone = parseInt(timezoneInput.value, 10);
+
+    if (isNaN(lat) || isNaN(lng) || isNaN(timezone)) {
+      showStatus('Please fill in all coordinate fields');
+      return;
+    }
+  } else {
+    city = citySelect.value;
+    const coords = CITIES[city];
+    lat = coords.lat;
+    lng = coords.lng;
+    timezone = coords.timezone;
+  }
+
+  const settings = {
+    city,
+    lat,
+    lng,
+    timezone,
+    method: methodSelect.value,
+    asr: asrSelect.value,
+    maghrib: maghribSelect.value,
+    notifications: notificationsCheckbox.checked,
+    notifyMinutes: parseInt(notifyMinutesSelect.value, 10),
+    theme: themeSelect.value,
+    transparency: parseInt(transparencyInput.value, 10),
+  };
+
+  applyTheme(settings.theme);
+  await chrome.runtime.sendMessage({ type: 'saveSettings', settings });
+  showStatus('Settings saved');
+});
+
+citySelect.addEventListener('change', toggleCustomCoords);
+themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
+transparencyInput.addEventListener('input', () => {
+  transparencyValue.textContent = `${transparencyInput.value}%`;
+});
+
+loadSettings();

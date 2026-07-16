@@ -1,0 +1,28 @@
+{
+  "name": "Prayer Times",
+  "description": "A Chrome extension so you don't miss a daily prayer",
+  "version": "0.2.0",
+  "manifest_version": 3,
+  "author": "Qazi Sami ur Rahman",
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Prayer Times",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "permissions": ["storage", "alarms", "notifications"],
+  "options_page": "options/options.html"
+}

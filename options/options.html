@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prayer Times — Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <div class="options">
+      <header class="header">
+        <div class="header-title">
+          <img src="../icons/icon-32.png" alt="" class="header-icon" width="24" height="24" />
+          <h1 class="title">Prayer Times Settings</h1>
+        </div>
+      </header>
+
+      <form id="settings-form" class="form" autocomplete="off">
+        <fieldset class="fieldset">
+          <legend class="legend">Location</legend>
+
+          <div class="field">
+            <label for="city" class="label">City</label>
+            <select id="city" class="select">
+              <option value="Islamabad">Islamabad, Pakistan</option>
+              <option value="Karachi">Karachi, Pakistan</option>
+              <option value="Lahore">Lahore, Pakistan</option>
+              <option value="Peshawar">Peshawar, Pakistan</option>
+              <option value="Quetta">Quetta, Pakistan</option>
+              <option value="Riyadh">Riyadh, Saudi Arabia</option>
+              <option value="Jeddah">Jeddah, Saudi Arabia</option>
+              <option value="Mecca">Mecca, Saudi Arabia</option>
+              <option value="Medina">Medina, Saudi Arabia</option>
+              <option value="Dubai">Dubai, UAE</option>
+              <option value="Abu Dhabi">Abu Dhabi, UAE</option>
+              <option value="Istanbul">Istanbul, Turkey</option>
+              <option value="Cairo">Cairo, Egypt</option>
+              <option value="Kuala Lumpur">Kuala Lumpur, Malaysia</option>
+              <option value="Jakarta">Jakarta, Indonesia</option>
+              <option value="London">London, UK</option>
+              <option value="New York">New York, USA</option>
+              <option value="Toronto">Toronto, Canada</option>
+              <option value="Custom">Custom coordinates</option>
+            </select>
+          </div>
+
+          <div id="custom-coords" class="field-group" hidden>
+            <div class="field-row">
+              <div class="field">
+                <label for="lat" class="label">Latitude</label>
+                <input id="lat" class="input" type="number" step="any" placeholder="33.6995" />
+              </div>
+              <div class="field">
+                <label for="lng" class="label">Longitude</label>
+                <input id="lng" class="input" type="number" step="any" placeholder="73.0363" />
+              </div>
+            </div>
+            <div class="field">
+              <label for="timezone" class="label">Timezone (UTC offset)</label>
+              <input id="timezone" class="input" type="number" step="1" placeholder="5" />
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="legend">Calculation</legend>
+
+          <div class="field">
+            <label for="method" class="label">Method</label>
+            <select id="method" class="select">
+              <option value="Karachi">Karachi (University of Islamic Sciences)</option>
+              <option value="MWL">Muslim World League</option>
+              <option value="ISNA">ISNA (North America)</option>
+              <option value="Egypt">Egyptian General Authority</option>
+              <option value="Gulf">Gulf Region</option>
+              <option value="Kuwait">Kuwait</option>
+              <option value="Qatar">Qatar</option>
+              <option value="Singapore">Singapore</option>
+              <option value="Tehran">Tehran (Institute of Geophysics)</option>
+              <option value="JAKIM">JAKIM (Malaysia)</option>
+              <option value="DIYANET">Diyanet (Turkey)</option>
+              <option value="ISNA8">ISNA (8 degree)</option>
+              <option value="Turkey">Turkey (Diyanet, 18 degree)</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="asr" class="label">Asr Calculation</label>
+              <select id="asr" class="select">
+                <option value="Standard">Standard (Shafi'i)</option>
+                <option value="Hanafi">Hanafi</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="maghrib" class="label">Maghrib Adjustment</label>
+              <select id="maghrib" class="select">
+                <option value="0 min">None</option>
+                <option value="1 min">1 minute</option>
+                <option value="2 min">2 minutes</option>
+                <option value="3 min">3 minutes</option>
+                <option value="4 min">4 minutes</option>
+                <option value="5 min">5 minutes</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="legend">Appearance</legend>
+
+          <div class="field">
+            <label for="theme" class="label">Theme</label>
+            <select id="theme" class="select">
+              <option value="system">System default</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="transparency" class="label">Popup transparency: <span id="transparency-value">100%</span></label>
+            <input id="transparency" class="range" type="range" min="20" max="100" value="100" />
+          </div>
+        </fieldset>
+
+        <fieldset class="fieldset">
+          <legend class="legend">Notifications</legend>
+
+          <div class="field">
+            <div class="toggle-row">
+              <label for="notifications" class="label">Enable notifications</label>
+              <label class="toggle">
+                <input id="notifications" type="checkbox" />
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="notify-minutes" class="label">Remind before prayer (minutes)</label>
+            <select id="notify-minutes" class="select">
+              <option value="5">5 minutes</option>
+              <option value="10">10 minutes</option>
+              <option value="15">15 minutes</option>
+              <option value="20">20 minutes</option>
+              <option value="30">30 minutes</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="btn-save">Save Settings</button>
+          <span id="save-status" class="save-status" aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
+
+    <script src="options.js"></script>
+  </body>
+</html>

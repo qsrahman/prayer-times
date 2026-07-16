@@ -1,0 +1,211 @@
+:root {
+  --color-primary: #0D9488;
+  --color-primary-light: #CCFBF1;
+  --color-accent: #D97706;
+  --color-bg: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-text: #1E293B;
+  --color-text-secondary: #64748B;
+  --color-border: #E2E8F0;
+  --color-active-bg: #F0FDF4;
+  --color-active-border: #0D9488;
+  --color-next-bg: #FEF9C3;
+  --color-next-text: #D97706;
+  --color-hover: #E2E8F0;
+  --color-badge-green: #0D9488;
+  --color-badge-orange: #F59E0B;
+  --color-badge-red: #EF4444;
+  --bg-alpha: 1;
+  --radius: 8px;
+  --radius-sm: 4px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #0F172A;
+    --color-surface: #1E293B;
+    --color-text: #F1F5F9;
+    --color-text-secondary: #94A3B8;
+    --color-border: #334155;
+    --color-active-bg: #134E4A;
+    --color-active-border: #14B8A6;
+    --color-next-bg: rgba(217, 119, 6, 0.1);
+    --color-hover: #3B4C63;
+    --color-primary-light: #134E4A;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #0F172A;
+  --color-surface: #1E293B;
+  --color-text: #F1F5F9;
+  --color-text-secondary: #94A3B8;
+  --color-border: #334155;
+  --color-active-bg: #134E4A;
+  --color-active-border: #14B8A6;
+  --color-next-bg: rgba(217, 119, 6, 0.1);
+  --color-hover: #3B4C63;
+  --color-primary-light: #134E4A;
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: rgba(248, 250, 252, var(--bg-alpha));
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body {
+    background: rgba(15, 23, 42, var(--bg-alpha));
+  }
+}
+
+:root[data-theme="dark"] body {
+  background: rgba(15, 23, 42, var(--bg-alpha));
+}
+
+.popup {
+  width: 280px;
+  padding: var(--space-lg);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.header-icon {
+  opacity: 1;
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+}
+
+.date {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: var(--space-xs);
+}
+
+.location {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--color-border);
+  margin: var(--space-md) 0;
+}
+
+.prayer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.prayer-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  transition: background-color 0.15s ease;
+}
+
+.prayer-row:hover {
+  background: var(--color-hover);
+}
+
+.prayer-row--active {
+  background: var(--color-active-bg);
+  border-left: 3px solid var(--color-active-border);
+  padding-left: calc(var(--space-md) - 3px);
+}
+
+.prayer-row--next {
+  background: var(--color-next-bg);
+}
+
+.prayer-name {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.prayer-row--next .prayer-name {
+  color: var(--color-next-text);
+}
+
+.prayer-time {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-secondary);
+}
+
+.prayer-row--next .prayer-time {
+  color: var(--color-next-text);
+  font-weight: 600;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.countdown {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.settings-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.settings-btn:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+.error-message {
+  text-align: center;
+  padding: var(--space-lg);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+}
