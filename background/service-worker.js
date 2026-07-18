@@ -1,4 +1,4 @@
-importScripts('../lib/prayer-times.js', '../lib/shared.js');
+importScripts('../lib/praytime.js', '../lib/shared.js');
 
 async function getSettings() {
   const stored = await chrome.storage.sync.get('settings');

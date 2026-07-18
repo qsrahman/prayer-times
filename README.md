@@ -61,7 +61,7 @@ prayer-times/
 │   ├── options.css            # Matching design system
 │   └── options.js             # Load/save settings via messaging
 ├── lib/
-│   ├── prayer-times.js        # Third-party prayer calculation (DO NOT MODIFY)
+│   ├── praytime.js        # Third-party prayer calculation (DO NOT MODIFY)
 │   └── shared.js              # Shared constants and utility functions
 ├── icons/
 │   └── icon-{16,32,48,128}.png
@@ -107,7 +107,7 @@ No build step required. No dependencies to install.
 
 ### Key Conventions
 
-- **Never modify `lib/prayer-times.js`** — third-party library
+- **Never modify `lib/praytime.js`** — third-party library
 - **Shared code in `lib/shared.js`** — `PRAYER_NAMES`, `DEFAULT_SETTINGS`, custom methods, `parseTime12h()`, `getCurrentPrayer()`, `getNextPrayer()`, `applyTheme()`
 - **Manifest V3 only** — no V2 APIs
 - **Service worker is ephemeral** — use `chrome.storage`, no global state

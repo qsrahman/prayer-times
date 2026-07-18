@@ -18,7 +18,7 @@ prayer-times/
 │   ├── options.css          # Matches popup design system
 │   └── options.js           # Load/save settings via chrome.storage.sync
 ├── lib/
-│   └── prayer-times.js      # Third-party prayer time calculation library (DO NOT MODIFY)
+│   └── praytime.js      # Third-party prayer time calculation library (DO NOT MODIFY)
 └── icons/
     └── icon-{16,32,48,128}.png  # Sized PNGs generated from images/small-mosque.png
 ```
@@ -74,7 +74,7 @@ Notification icon URLs MUST use `chrome.runtime.getURL()` — relative paths res
 
 ## Rules
 
-1. **Never modify `lib/prayer-times.js`** — it's a third-party library.
+1. **Never modify `lib/praytime.js`** — it's a third-party library.
 2. **Always Manifest V3** — no V2 APIs (`chrome.browserAction`, `chrome.tabs.executeScript`, etc.).
 3. **Service worker is ephemeral** — no global state variables. Use `chrome.storage`.
 4. **Notification `iconUrl`** — always use `chrome.runtime.getURL('icons/icon-128.png')`, never a relative path.
