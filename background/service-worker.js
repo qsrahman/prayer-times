@@ -43,7 +43,7 @@ async function checkNotifications() {
     const times = calcTimes(settings);
     const next = getNextPrayer(times);
 
-    if (next && next.diffMin === settings.notifyMinutes) {
+    if (next && next.diffMin <= settings.notifyMinutes) {
       const { notifiedPrayers = [] } = await chrome.storage.session.get('notifiedPrayers');
 
       if (!notifiedPrayers.includes(next.name)) {
@@ -61,14 +61,22 @@ async function checkNotifications() {
       }
     }
 
-    if (next && next.diffMin === 1) {
-      await chrome.notifications.create(`prayer-now-${next.name}`, {
-        type: 'basic',
-        iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
-        title: `${next.name} time`,
-        message: `It is now time for ${next.name} prayer.`,
-        priority: 2,
-      });
+    if (next && next.diffMin <= 1) {
+      const { prayedPrayers = [] } = await chrome.storage.session.get('prayedPrayers');
+
+      if (!prayedPrayers.includes(next.name)) {
+        await chrome.notifications.create(`prayer-now-${next.name}`, {
+          type: 'basic',
+          iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
+          title: `${next.name} time`,
+          message: `It is now time for ${next.name} prayer.`,
+          priority: 2,
+        });
+
+        await chrome.storage.session.set({
+          prayedPrayers: [...prayedPrayers, next.name],
+        });
+      }
     }
   } catch (err) {
     console.error('Notification check failed:', err);
@@ -110,7 +118,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'saveSettings') {
     (async () => {
       await chrome.storage.sync.set({ settings: message.settings });
-      await chrome.storage.session.set({ notifiedPrayers: [] });
+      await chrome.storage.session.set({ notifiedPrayers: [], prayedPrayers: [] });
       await updateBadge();
       sendResponse({ ok: true });
     })();
