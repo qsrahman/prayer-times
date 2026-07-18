@@ -15,7 +15,6 @@
   --color-badge-green: #0D9488;
   --color-badge-orange: #F59E0B;
   --color-badge-red: #EF4444;
-  --bg-alpha: 1;
   --radius: 8px;
   --radius-sm: 4px;
   --space-xs: 4px;
@@ -64,18 +63,8 @@ body {
   font-size: 14px;
   line-height: 1.5;
   color: var(--color-text);
-  background: rgba(248, 250, 252, var(--bg-alpha));
+  background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) body {
-    background: rgba(15, 23, 42, var(--bg-alpha));
-  }
-}
-
-:root[data-theme="dark"] body {
-  background: rgba(15, 23, 42, var(--bg-alpha));
 }
 
 .popup {

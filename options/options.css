@@ -257,34 +257,3 @@ body {
 .save-status.visible {
   opacity: 1;
 }
-
-.range {
-  width: 100%;
-  height: 6px;
-  margin-top: var(--space-xs);
-  background: var(--color-input-border);
-  border-radius: 3px;
-  outline: none;
-  appearance: none;
-  -webkit-appearance: none;
-  cursor: pointer;
-}
-
-.range::-webkit-slider-thumb {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  background: var(--color-primary);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform 0.15s ease;
-}
-
-.range::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
-}
-
-.range:focus-visible {
-  box-shadow: 0 0 0 3px var(--color-focus-ring);
-}

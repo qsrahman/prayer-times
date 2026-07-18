@@ -9,7 +9,6 @@ const DEFAULT_SETTINGS = {
   maghrib: '4 min',
   timezone: 5,
   theme: 'system',
-  transparency: 100,
 };
 
 function applyTheme(theme) {
@@ -18,11 +17,6 @@ function applyTheme(theme) {
   } else {
     document.documentElement.setAttribute('data-theme', theme);
   }
-}
-
-function applyTransparency(value) {
-  const alpha = (value || 100) / 100;
-  document.documentElement.style.setProperty('--bg-alpha', alpha);
 }
 
 function formatDate(date) {
@@ -93,7 +87,6 @@ async function init() {
   const stored = await chrome.storage.sync.get('settings');
   const storedSettings = stored.settings || {};
   applyTheme(storedSettings.theme || 'system');
-  applyTransparency(storedSettings.transparency || 100);
 
   try {
     let data;

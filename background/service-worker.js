@@ -12,7 +12,6 @@ const DEFAULT_SETTINGS = {
   timezone: 5,
   notifications: true,
   notifyMinutes: 10,
-  transparency: 100,
 };
 
 async function getSettings() {

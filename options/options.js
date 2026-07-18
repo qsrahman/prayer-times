@@ -30,7 +30,6 @@ const DEFAULT_SETTINGS = {
   notifications: true,
   notifyMinutes: 10,
   theme: 'system',
-  transparency: 100,
 };
 
 const form = document.getElementById('settings-form');
@@ -45,8 +44,6 @@ const maghribSelect = document.getElementById('maghrib');
 const notificationsCheckbox = document.getElementById('notifications');
 const notifyMinutesSelect = document.getElementById('notify-minutes');
 const themeSelect = document.getElementById('theme');
-const transparencyInput = document.getElementById('transparency');
-const transparencyValue = document.getElementById('transparency-value');
 const saveStatus = document.getElementById('save-status');
 
 function applyTheme(theme) {
@@ -91,8 +88,6 @@ async function loadSettings() {
   notifyMinutesSelect.value = String(settings.notifyMinutes);
   themeSelect.value = settings.theme || 'system';
   applyTheme(settings.theme || 'system');
-  transparencyInput.value = settings.transparency || 100;
-  transparencyValue.textContent = `${settings.transparency || 100}%`;
 }
 
 form.addEventListener('submit', async (e) => {
@@ -129,7 +124,6 @@ form.addEventListener('submit', async (e) => {
     notifications: notificationsCheckbox.checked,
     notifyMinutes: parseInt(notifyMinutesSelect.value, 10),
     theme: themeSelect.value,
-    transparency: parseInt(transparencyInput.value, 10),
   };
 
   applyTheme(settings.theme);
@@ -139,8 +133,5 @@ form.addEventListener('submit', async (e) => {
 
 citySelect.addEventListener('change', toggleCustomCoords);
 themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
-transparencyInput.addEventListener('input', () => {
-  transparencyValue.textContent = `${transparencyInput.value}%`;
-});
 
 loadSettings();
