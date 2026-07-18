@@ -46,14 +46,6 @@ const notifyMinutesSelect = document.getElementById('notify-minutes');
 const themeSelect = document.getElementById('theme');
 const saveStatus = document.getElementById('save-status');
 
-function applyTheme(theme) {
-  if (theme === 'system') {
-    document.documentElement.removeAttribute('data-theme');
-  } else {
-    document.documentElement.setAttribute('data-theme', theme);
-  }
-}
-
 function showStatus(message) {
   saveStatus.textContent = message;
   saveStatus.classList.add('visible');

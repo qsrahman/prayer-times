@@ -1,28 +1,4 @@
-importScripts('../lib/prayer-times.js');
-
-const PRAYER_NAMES = ['Fajr', 'Sunrise', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-
-const DEFAULT_SETTINGS = {
-  city: 'Islamabad',
-  lat: 33.6995,
-  lng: 73.0363,
-  method: 'Karachi',
-  asr: 'Hanafi',
-  maghrib: '4 min',
-  timezone: 'Asia/Karachi',
-  notifications: true,
-  notifyMinutes: 10,
-};
-
-const praytime = new PrayTime();
-
-praytime.methods['Gulf'] = { fajr: 19.5, isha: '90 min' };
-praytime.methods['Kuwait'] = { fajr: 18, isha: 17 };
-praytime.methods['Qatar'] = { fajr: 18, isha: '90 min' };
-praytime.methods['JAKIM'] = { fajr: 18, isha: 18 };
-praytime.methods['DIYANET'] = { fajr: 18, isha: 17 };
-praytime.methods['ISNA8'] = { fajr: 8, isha: 8 };
-praytime.methods['Turkey'] = { fajr: 18, isha: 17 };
+importScripts('../lib/prayer-times.js', '../lib/shared.js');
 
 async function getSettings() {
   const stored = await chrome.storage.sync.get('settings');
@@ -37,43 +13,6 @@ function calcTimes(settings) {
     .adjust({ maghrib: settings.maghrib, asr: settings.asr })
     .format('12h')
     .getTimes();
-}
-
-function parseTime12h(timeStr) {
-  const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
-  if (!match) return null;
-  let [, h, m, period] = match;
-  h = parseInt(h, 10);
-  m = parseInt(m, 10);
-  if (period.toUpperCase() === 'PM' && h !== 12) h += 12;
-  if (period.toUpperCase() === 'AM' && h === 12) h = 0;
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
-}
-
-function getNextPrayer(times) {
-  const now = new Date();
-  for (const name of PRAYER_NAMES) {
-    const time = parseTime12h(times[name.toLowerCase()]);
-    if (time && time > now) {
-      const diffMs = time - now;
-      const diffMin = Math.ceil(diffMs / 60000);
-      return { name, time, diffMin };
-    }
-  }
-  return null;
-}
-
-function getCurrentPrayer(times) {
-  const now = new Date();
-  let current = null;
-  for (const name of PRAYER_NAMES) {
-    const time = parseTime12h(times[name.toLowerCase()]);
-    if (time && time <= now) {
-      current = name;
-    }
-  }
-  return current;
 }
 
 async function updateBadge() {
@@ -178,3 +117,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 });
+
+const praytime = new PrayTime();
+setupPrayTime(praytime);
