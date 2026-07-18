@@ -7,7 +7,7 @@ const DEFAULT_SETTINGS = {
   method: 'Karachi',
   asr: 'Hanafi',
   maghrib: '4 min',
-  timezone: 5,
+  timezone: 'Asia/Karachi',
   theme: 'system',
 };
 
@@ -17,6 +17,13 @@ function applyTheme(theme) {
   } else {
     document.documentElement.setAttribute('data-theme', theme);
   }
+}
+
+function getUTCOffset(ianaTimezone) {
+  const now = new Date();
+  const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
+  const tzStr = now.toLocaleString('en-US', { timeZone: ianaTimezone });
+  return (new Date(tzStr) - new Date(utcStr)) / (60 * 60 * 1000);
 }
 
 function formatDate(date) {
@@ -110,10 +117,11 @@ async function init() {
       settings = DEFAULT_SETTINGS;
       prayTimes.setMethod(settings.method);
       prayTimes.adjust({ maghrib: settings.maghrib, asr: settings.asr });
+      const offset = getUTCOffset(settings.timezone);
       times = prayTimes.getTimes(
         new Date(),
         [settings.lat, settings.lng],
-        settings.timezone,
+        offset,
         0,
         '12h'
       );

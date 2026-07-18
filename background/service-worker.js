@@ -9,10 +9,17 @@ const DEFAULT_SETTINGS = {
   method: 'Karachi',
   asr: 'Hanafi',
   maghrib: '4 min',
-  timezone: 5,
+  timezone: 'Asia/Karachi',
   notifications: true,
   notifyMinutes: 10,
 };
+
+function getUTCOffset(ianaTimezone) {
+  const now = new Date();
+  const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
+  const tzStr = now.toLocaleString('en-US', { timeZone: ianaTimezone });
+  return (new Date(tzStr) - new Date(utcStr)) / (60 * 60 * 1000);
+}
 
 async function getSettings() {
   const stored = await chrome.storage.sync.get('settings');
@@ -22,10 +29,11 @@ async function getSettings() {
 function calcTimes(settings) {
   prayTimes.setMethod(settings.method);
   prayTimes.adjust({ maghrib: settings.maghrib, asr: settings.asr });
+  const offset = getUTCOffset(settings.timezone);
   return prayTimes.getTimes(
     new Date(),
     [settings.lat, settings.lng],
-    settings.timezone,
+    offset,
     0,
     '12h'
   );

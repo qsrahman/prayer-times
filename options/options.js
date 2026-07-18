@@ -1,22 +1,22 @@
 const CITIES = {
-  Islamabad: { lat: 33.6995, lng: 73.0363, timezone: 5 },
-  Karachi: { lat: 24.8607, lng: 67.0011, timezone: 5 },
-  Lahore: { lat: 31.5204, lng: 74.3587, timezone: 5 },
-  Peshawar: { lat: 34.0151, lng: 71.5249, timezone: 5 },
-  Quetta: { lat: 30.1798, lng: 66.975, timezone: 5 },
-  Riyadh: { lat: 24.7136, lng: 46.6753, timezone: 3 },
-  Jeddah: { lat: 21.4858, lng: 39.1925, timezone: 3 },
-  Mecca: { lat: 21.3891, lng: 39.8579, timezone: 3 },
-  Medina: { lat: 24.5247, lng: 39.5691, timezone: 3 },
-  Dubai: { lat: 25.2048, lng: 55.2708, timezone: 4 },
-  'Abu Dhabi': { lat: 24.4539, lng: 54.3773, timezone: 4 },
-  Istanbul: { lat: 41.0082, lng: 28.9784, timezone: 3 },
-  Cairo: { lat: 30.0444, lng: 31.2357, timezone: 2 },
-  'Kuala Lumpur': { lat: 3.139, lng: 101.6869, timezone: 8 },
-  Jakarta: { lat: -6.2088, lng: 106.8456, timezone: 7 },
-  London: { lat: 51.5074, lng: -0.1278, timezone: 0 },
-  'New York': { lat: 40.7128, lng: -74.006, timezone: -5 },
-  Toronto: { lat: 43.6532, lng: -79.3832, timezone: -5 },
+  Islamabad: { lat: 33.6995, lng: 73.0363, timezone: 'Asia/Karachi' },
+  Karachi: { lat: 24.8607, lng: 67.0011, timezone: 'Asia/Karachi' },
+  Lahore: { lat: 31.5204, lng: 74.3587, timezone: 'Asia/Karachi' },
+  Peshawar: { lat: 34.0151, lng: 71.5249, timezone: 'Asia/Karachi' },
+  Quetta: { lat: 30.1798, lng: 66.975, timezone: 'Asia/Karachi' },
+  Riyadh: { lat: 24.7136, lng: 46.6753, timezone: 'Asia/Riyadh' },
+  Jeddah: { lat: 21.4858, lng: 39.1925, timezone: 'Asia/Riyadh' },
+  Mecca: { lat: 21.3891, lng: 39.8579, timezone: 'Asia/Riyadh' },
+  Medina: { lat: 24.5247, lng: 39.5691, timezone: 'Asia/Riyadh' },
+  Dubai: { lat: 25.2048, lng: 55.2708, timezone: 'Asia/Dubai' },
+  'Abu Dhabi': { lat: 24.4539, lng: 54.3773, timezone: 'Asia/Dubai' },
+  Istanbul: { lat: 41.0082, lng: 28.9784, timezone: 'Europe/Istanbul' },
+  Cairo: { lat: 30.0444, lng: 31.2357, timezone: 'Africa/Cairo' },
+  'Kuala Lumpur': { lat: 3.139, lng: 101.6869, timezone: 'Asia/Kuala_Lumpur' },
+  Jakarta: { lat: -6.2088, lng: 106.8456, timezone: 'Asia/Jakarta' },
+  London: { lat: 51.5074, lng: -0.1278, timezone: 'Europe/London' },
+  'New York': { lat: 40.7128, lng: -74.006, timezone: 'America/New_York' },
+  Toronto: { lat: 43.6532, lng: -79.3832, timezone: 'America/Toronto' },
 };
 
 const DEFAULT_SETTINGS = {
@@ -26,7 +26,7 @@ const DEFAULT_SETTINGS = {
   method: 'Karachi',
   asr: 'Hanafi',
   maghrib: '4 min',
-  timezone: 5,
+  timezone: 'Asia/Karachi',
   notifications: true,
   notifyMinutes: 10,
   theme: 'system',
@@ -83,7 +83,7 @@ async function loadSettings() {
     lngInput.value = settings.lng;
   }
 
-  timezoneInput.value = settings.timezone;
+  timezoneInput.value = settings.timezone || 'Asia/Karachi';
   toggleCustomCoords();
 
   methodSelect.value = settings.method;
@@ -116,9 +116,9 @@ form.addEventListener('submit', async (e) => {
     lng = coords.lng;
   }
 
-  const timezone = parseInt(timezoneInput.value, 10);
-  if (isNaN(timezone)) {
-    showStatus('Please enter a valid timezone');
+  const timezone = timezoneInput.value.trim();
+  if (!timezone || !timezone.includes('/')) {
+    showStatus('Please enter a valid IANA timezone (e.g. Asia/Karachi)');
     return;
   }
 
