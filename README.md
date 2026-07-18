@@ -7,13 +7,12 @@ A Chrome extension (Manifest V3) that displays daily Islamic prayer times with c
 - **Prayer Times Display** — Shows all 6 daily prayers (Fajr, Sunrise, Dhuhr, Asr, Maghrib, Isha) with current/next highlighting
 - **Countdown Timer** — Live countdown to the next prayer in the popup footer
 - **Badge Countdown** — Extension icon badge shows time remaining (green >30m, orange <30m, red <5m)
-- **Notifications** — Configurable pre-prayer reminders (5/10/15/20/30 minutes before)
+- **Notifications** — Configurable pre-prayer reminders (5/10/15/20/30 minutes before) and prayer-time alerts
 - **18 Preset Cities** — Islamabad, Karachi, Mecca, Dubai, Istanbul, London, New York, and more
-- **Custom Coordinates** — Enter any latitude, longitude, and UTC offset
-- **13 Calculation Methods** — Karachi, MWL, ISNA, Egypt, Gulf, Tehran, JAKIM, Diyanet, and others
+- **Custom Coordinates** — Enter any latitude, longitude, and IANA timezone
+- **13 Calculation Methods** — Karachi, MWL, ISNA, Egypt, Gulf, Kuwait, Qatar, Tehran, JAKIM, Diyanet, Turkey, ISNA8, and others
 - **Asr & Maghrib Adjustments** — Standard/Hanafi Asr, 0-5 minute Maghrib offset
 - **Dark Mode** — System default, manual light, or manual dark
-- **Popup Transparency** — Adjustable opacity (20%-100%) for the popup background
 
 ## Installation
 
@@ -43,7 +42,7 @@ A Chrome extension (Manifest V3) that displays daily Islamic prayer times with c
 |---------|---------|
 | **Location** | City dropdown or custom lat/lng/timezone |
 | **Calculation** | Method, Asr type, Maghrib adjustment |
-| **Appearance** | Theme (system/light/dark), popup transparency |
+| **Appearance** | Theme (system/light/dark) |
 | **Notifications** | Enable/disable, reminder timing |
 
 ## Architecture
@@ -62,7 +61,8 @@ prayer-times/
 │   ├── options.css            # Matching design system
 │   └── options.js             # Load/save settings via messaging
 ├── lib/
-│   └── prayer-times.js        # Third-party prayer calculation (DO NOT MODIFY)
+│   ├── prayer-times.js        # Third-party prayer calculation (DO NOT MODIFY)
+│   └── shared.js              # Shared constants and utility functions
 ├── icons/
 │   └── icon-{16,32,48,128}.png
 └── images/
@@ -86,14 +86,13 @@ All settings stored under a single `"settings"` key:
   city: string,           // Preset city name or "Custom"
   lat: number,            // Latitude
   lng: number,            // Longitude
-  timezone: number,       // UTC offset (e.g. 5 for Pakistan)
+  timezone: string,       // IANA timezone (e.g. "Asia/Karachi")
   method: string,         // Calculation method
   asr: string,            // "Standard" or "Hanafi"
   maghrib: string,        // e.g. "4 min"
   notifications: boolean, // Enable/disable notifications
   notifyMinutes: number,  // Minutes before prayer (5/10/15/20/30)
-  theme: string,          // "system" | "light" | "dark"
-  transparency: number    // Popup opacity 20-100
+  theme: string           // "system" | "light" | "dark"
 }
 ```
 
@@ -109,8 +108,10 @@ No build step required. No dependencies to install.
 ### Key Conventions
 
 - **Never modify `lib/prayer-times.js`** — third-party library
+- **Shared code in `lib/shared.js`** — `PRAYER_NAMES`, `DEFAULT_SETTINGS`, custom methods, `parseTime12h()`, `getCurrentPrayer()`, `getNextPrayer()`, `applyTheme()`
 - **Manifest V3 only** — no V2 APIs
 - **Service worker is ephemeral** — use `chrome.storage`, no global state
+- **Notification `iconUrl`** — always use `chrome.runtime.getURL()`, not relative paths
 - **CSS variables** — use `--color-*` tokens, never hardcode colors
 - **Dark mode** — define variables in both `@media (prefers-color-scheme: dark)` and `[data-theme="dark"]`
 - **Async/await** — no `.then()` chains
