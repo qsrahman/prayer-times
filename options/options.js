@@ -19,19 +19,6 @@ const CITIES = {
   Toronto: { lat: 43.6532, lng: -79.3832, timezone: 'America/Toronto' },
 };
 
-const DEFAULT_SETTINGS = {
-  city: 'Islamabad',
-  lat: 33.6995,
-  lng: 73.0363,
-  method: 'Karachi',
-  asr: 'Hanafi',
-  maghrib: '4 min',
-  timezone: 'Asia/Karachi',
-  notifications: true,
-  notifyMinutes: 10,
-  theme: 'system',
-};
-
 const form = document.getElementById('settings-form');
 const citySelect = document.getElementById('city');
 const customCoords = document.getElementById('custom-coords');
