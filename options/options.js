@@ -63,6 +63,11 @@ function showStatus(message) {
 function toggleCustomCoords() {
   const isCustom = citySelect.value === 'Custom';
   customCoords.hidden = !isCustom;
+
+  if (!isCustom) {
+    const coords = CITIES[citySelect.value];
+    if (coords) timezoneInput.value = coords.timezone;
+  }
 }
 
 async function loadSettings() {
@@ -76,9 +81,9 @@ async function loadSettings() {
     citySelect.value = 'Custom';
     latInput.value = settings.lat;
     lngInput.value = settings.lng;
-    timezoneInput.value = settings.timezone;
   }
 
+  timezoneInput.value = settings.timezone;
   toggleCustomCoords();
 
   methodSelect.value = settings.method;
@@ -93,15 +98,14 @@ async function loadSettings() {
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  let lat, lng, timezone, city;
+  let lat, lng, city;
 
   if (citySelect.value === 'Custom') {
     city = 'Custom';
     lat = parseFloat(latInput.value);
     lng = parseFloat(lngInput.value);
-    timezone = parseInt(timezoneInput.value, 10);
 
-    if (isNaN(lat) || isNaN(lng) || isNaN(timezone)) {
+    if (isNaN(lat) || isNaN(lng)) {
       showStatus('Please fill in all coordinate fields');
       return;
     }
@@ -110,7 +114,12 @@ form.addEventListener('submit', async (e) => {
     const coords = CITIES[city];
     lat = coords.lat;
     lng = coords.lng;
-    timezone = coords.timezone;
+  }
+
+  const timezone = parseInt(timezoneInput.value, 10);
+  if (isNaN(timezone)) {
+    showStatus('Please enter a valid timezone');
+    return;
   }
 
   const settings = {
