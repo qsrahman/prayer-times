@@ -11,19 +11,22 @@ const DEFAULT_SETTINGS = {
   theme: 'system',
 };
 
+const praytime = new PrayTime();
+
+praytime.methods['Gulf'] = { fajr: 19.5, isha: '90 min' };
+praytime.methods['Kuwait'] = { fajr: 18, isha: 17 };
+praytime.methods['Qatar'] = { fajr: 18, isha: '90 min' };
+praytime.methods['JAKIM'] = { fajr: 18, isha: 18 };
+praytime.methods['DIYANET'] = { fajr: 18, isha: 17 };
+praytime.methods['ISNA8'] = { fajr: 8, isha: 8 };
+praytime.methods['Turkey'] = { fajr: 18, isha: 17 };
+
 function applyTheme(theme) {
   if (theme === 'system') {
     document.documentElement.removeAttribute('data-theme');
   } else {
     document.documentElement.setAttribute('data-theme', theme);
   }
-}
-
-function getUTCOffset(ianaTimezone) {
-  const now = new Date();
-  const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
-  const tzStr = now.toLocaleString('en-US', { timeZone: ianaTimezone });
-  return (new Date(tzStr) - new Date(utcStr)) / (60 * 60 * 1000);
 }
 
 function formatDate(date) {
@@ -115,16 +118,13 @@ async function init() {
       settings = data.settings;
     } else {
       settings = DEFAULT_SETTINGS;
-      prayTimes.setMethod(settings.method);
-      prayTimes.adjust({ maghrib: settings.maghrib, asr: settings.asr });
-      const offset = getUTCOffset(settings.timezone);
-      times = prayTimes.getTimes(
-        new Date(),
-        [settings.lat, settings.lng],
-        offset,
-        0,
-        '12h'
-      );
+      times = praytime
+        .method(settings.method)
+        .location([settings.lat, settings.lng])
+        .timezone(settings.timezone)
+        .adjust({ maghrib: settings.maghrib, asr: settings.asr })
+        .format('12h')
+        .getTimes();
       current = getCurrentPrayer(times);
       next = getNextPrayer(times);
     }

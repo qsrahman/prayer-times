@@ -14,12 +14,15 @@ const DEFAULT_SETTINGS = {
   notifyMinutes: 10,
 };
 
-function getUTCOffset(ianaTimezone) {
-  const now = new Date();
-  const utcStr = now.toLocaleString('en-US', { timeZone: 'UTC' });
-  const tzStr = now.toLocaleString('en-US', { timeZone: ianaTimezone });
-  return (new Date(tzStr) - new Date(utcStr)) / (60 * 60 * 1000);
-}
+const praytime = new PrayTime();
+
+praytime.methods['Gulf'] = { fajr: 19.5, isha: '90 min' };
+praytime.methods['Kuwait'] = { fajr: 18, isha: 17 };
+praytime.methods['Qatar'] = { fajr: 18, isha: '90 min' };
+praytime.methods['JAKIM'] = { fajr: 18, isha: 18 };
+praytime.methods['DIYANET'] = { fajr: 18, isha: 17 };
+praytime.methods['ISNA8'] = { fajr: 8, isha: 8 };
+praytime.methods['Turkey'] = { fajr: 18, isha: 17 };
 
 async function getSettings() {
   const stored = await chrome.storage.sync.get('settings');
@@ -27,16 +30,13 @@ async function getSettings() {
 }
 
 function calcTimes(settings) {
-  prayTimes.setMethod(settings.method);
-  prayTimes.adjust({ maghrib: settings.maghrib, asr: settings.asr });
-  const offset = getUTCOffset(settings.timezone);
-  return prayTimes.getTimes(
-    new Date(),
-    [settings.lat, settings.lng],
-    offset,
-    0,
-    '12h'
-  );
+  return praytime
+    .method(settings.method)
+    .location([settings.lat, settings.lng])
+    .timezone(settings.timezone)
+    .adjust({ maghrib: settings.maghrib, asr: settings.asr })
+    .format('12h')
+    .getTimes();
 }
 
 function parseTime12h(timeStr) {
