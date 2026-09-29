@@ -10,7 +10,7 @@
   --color-active-bg: #F0FDF4;
   --color-active-border: #0D9488;
   --color-next-bg: #FEF9C3;
-  --color-next-text: #D97706;
+  --color-next-text: #B45309;
   --color-hover: #E2E8F0;
   --color-badge-green: #0D9488;
   --color-badge-orange: #F59E0B;
@@ -36,6 +36,7 @@
     --color-next-bg: rgba(217, 119, 6, 0.1);
     --color-hover: #3B4C63;
     --color-primary-light: #134E4A;
+    --color-next-text: #D97706;
   }
 }
 
@@ -50,6 +51,7 @@
   --color-next-bg: rgba(217, 119, 6, 0.1);
   --color-hover: #3B4C63;
   --color-primary-light: #134E4A;
+  --color-next-text: #D97706;
 }
 
 * {
@@ -102,7 +104,7 @@ body {
 }
 
 .location {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--color-text-secondary);
   margin-top: 2px;
 }
@@ -151,6 +153,19 @@ body {
   color: var(--color-next-text);
 }
 
+.prayer-tag {
+  margin-left: var(--space-sm);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-secondary);
+}
+
+.prayer-row--next .prayer-tag {
+  color: var(--color-next-text);
+}
+
 .prayer-time {
   font-size: 13px;
   font-variant-numeric: tabular-nums;
@@ -169,7 +184,7 @@ body {
 }
 
 .countdown {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--color-text-secondary);
 }
 
@@ -177,8 +192,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -190,6 +205,11 @@ body {
 .settings-btn:hover {
   background: var(--color-border);
   color: var(--color-text);
+}
+
+.settings-btn:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .error-message {

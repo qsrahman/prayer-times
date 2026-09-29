@@ -44,20 +44,21 @@
             </select>
           </div>
 
-          <div class="field">
-            <label for="timezone" class="label">Timezone (IANA format)</label>
-            <input id="timezone" class="input" type="text" placeholder="Asia/Karachi" />
-          </div>
-
           <div id="custom-coords" class="field-group" hidden>
+            <div class="field">
+              <label for="timezone" class="label">Timezone (IANA format)</label>
+              <input id="timezone" class="input" type="text" list="timezones" placeholder="Asia/Karachi" />
+              <datalist id="timezones"></datalist>
+            </div>
+
             <div class="field-row">
               <div class="field">
                 <label for="lat" class="label">Latitude</label>
-                <input id="lat" class="input" type="number" step="any" placeholder="33.6995" />
+                <input id="lat" class="input" type="number" step="any" min="-90" max="90" placeholder="33.6995" />
               </div>
               <div class="field">
                 <label for="lng" class="label">Longitude</label>
-                <input id="lng" class="input" type="number" step="any" placeholder="73.0363" />
+                <input id="lng" class="input" type="number" step="any" min="-180" max="180" placeholder="73.0363" />
               </div>
             </div>
           </div>

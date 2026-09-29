@@ -3,6 +3,7 @@
   "description": "A Chrome extension so you don't miss a daily prayer",
   "version": "0.2.0",
   "manifest_version": 3,
+  "minimum_chrome_version": "102",
   "author": "Qazi Sami ur Rahman",
   "action": {
     "default_popup": "popup/popup.html",
