@@ -33,6 +33,10 @@ const notifyMinutesSelect = document.getElementById('notify-minutes');
 const themeSelect = document.getElementById('theme');
 const saveStatus = document.getElementById('save-status');
 
+document.getElementById('timezones').append(
+  ...['UTC', ...Intl.supportedValuesOf('timeZone')].map((tz) => new Option(tz)),
+);
+
 function showStatus(message) {
   saveStatus.textContent = message;
   saveStatus.classList.add('visible');
@@ -42,6 +46,12 @@ function showStatus(message) {
 function toggleCustomCoords() {
   const isCustom = citySelect.value === 'Custom';
   customCoords.hidden = !isCustom;
+
+  // Disabled inputs skip native validation, so hidden fields can't block submit.
+  for (const input of [latInput, lngInput]) {
+    input.disabled = !isCustom;
+    input.required = isCustom;
+  }
 
   if (!isCustom) {
     const coords = CITIES[citySelect.value];
@@ -83,11 +93,6 @@ form.addEventListener('submit', async (e) => {
     city = 'Custom';
     lat = parseFloat(latInput.value);
     lng = parseFloat(lngInput.value);
-
-    if (isNaN(lat) || isNaN(lng)) {
-      showStatus('Please fill in all coordinate fields');
-      return;
-    }
   } else {
     city = citySelect.value;
     const coords = CITIES[city];
@@ -96,7 +101,9 @@ form.addEventListener('submit', async (e) => {
   }
 
   const timezone = timezoneInput.value.trim();
-  if (!timezone || !timezone.includes('/')) {
+  try {
+    new Intl.DateTimeFormat('en', { timeZone: timezone });
+  } catch {
     showStatus('Please enter a valid IANA timezone (e.g. Asia/Karachi)');
     return;
   }
@@ -115,8 +122,14 @@ form.addEventListener('submit', async (e) => {
   };
 
   applyTheme(settings.theme);
-  await chrome.runtime.sendMessage({ type: 'saveSettings', settings });
-  showStatus('Settings saved');
+  try {
+    const res = await chrome.runtime.sendMessage({ type: 'saveSettings', settings });
+    if (!res?.ok) throw new Error(res?.error);
+    showStatus('Settings saved');
+  } catch (err) {
+    console.error('Save failed:', err);
+    showStatus('Could not save settings');
+  }
 });
 
 citySelect.addEventListener('change', toggleCustomCoords);

@@ -1,6 +1,3 @@
-const praytime = new PrayTime();
-setupPrayTime(praytime);
-
 function formatDate(date) {
   return date.toLocaleDateString('en-GB', {
     weekday: 'short',
@@ -32,42 +29,17 @@ async function init() {
     chrome.runtime.openOptionsPage();
   });
 
-  const stored = await chrome.storage.sync.get('settings');
-  const storedSettings = stored.settings || {};
-  applyTheme(storedSettings.theme || 'system');
-
   try {
-    let data;
-
-    if (chrome.runtime?.sendMessage) {
-      data = await chrome.runtime.sendMessage({ type: 'getPrayerData' });
+    const data = await chrome.runtime.sendMessage({ type: 'getPrayerData' });
+    if (!data || data.error) {
+      throw new Error(data?.error || 'No response from service worker');
     }
 
-    if (data?.error) {
-      throw new Error(data.error);
-    }
+    const { times, current, next, settings } = data;
+    applyTheme(settings.theme);
 
-    let times, current, next, settings;
-
-    if (data?.times) {
-      times = data.times;
-      current = data.current;
-      next = data.next;
-      settings = data.settings;
-    } else {
-      settings = DEFAULT_SETTINGS;
-      times = praytime
-        .method(settings.method)
-        .location([settings.lat, settings.lng])
-        .timezone(settings.timezone)
-        .adjust({ maghrib: settings.maghrib, asr: settings.asr })
-        .format('12h')
-        .getTimes();
-      current = getCurrentPrayer(times);
-      next = getNextPrayer(times);
-    }
-
-    locationEl.textContent = settings.city;
+    locationEl.textContent =
+      settings.city === 'Custom' ? `${settings.lat.toFixed(2)}, ${settings.lng.toFixed(2)}` : settings.city;
 
     contentEl.innerHTML = '';
 
@@ -85,6 +57,14 @@ async function init() {
       const timeSpan = document.createElement('span');
       timeSpan.className = 'prayer-time';
       timeSpan.textContent = times[name.toLowerCase()];
+
+      const tag = name === current ? 'Now' : next && name === next.name ? 'Next' : null;
+      if (tag) {
+        const tagSpan = document.createElement('span');
+        tagSpan.className = 'prayer-tag';
+        tagSpan.textContent = tag;
+        nameSpan.appendChild(tagSpan);
+      }
 
       row.appendChild(nameSpan);
       row.appendChild(timeSpan);

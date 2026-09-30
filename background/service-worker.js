@@ -1,25 +1,46 @@
 importScripts('../lib/praytime.js', '../lib/shared.js');
 
+const praytime = new PrayTime();
+setupPrayTime(praytime);
+
 async function getSettings() {
   const stored = await chrome.storage.sync.get('settings');
   return { ...DEFAULT_SETTINGS, ...(stored.settings || {}) };
 }
 
-function calcTimes(settings) {
+function calcTimes(settings, date) {
   return praytime
     .method(settings.method)
     .location([settings.lat, settings.lng])
     .timezone(settings.timezone)
     .adjust({ maghrib: settings.maghrib, asr: settings.asr })
     .format('12h')
-    .getTimes();
+    .times(date);
+}
+
+function getPrayerState(settings) {
+  const now = nowInZone(settings.timezone);
+  const [y, m, d] = now.date;
+  const tomorrow = new Date(Date.UTC(y, m - 1, d + 1));
+
+  const times = calcTimes(settings, now.date);
+  const tomorrowTimes = calcTimes(settings, [
+    tomorrow.getUTCFullYear(),
+    tomorrow.getUTCMonth() + 1,
+    tomorrow.getUTCDate(),
+  ]);
+
+  return {
+    times,
+    current: getCurrentPrayer(times, now.minutes),
+    next: getNextPrayer(times, now.minutes, tomorrowTimes),
+    dateKey: now.date.join('-'),
+  };
 }
 
 async function updateBadge() {
   try {
-    const settings = await getSettings();
-    const times = calcTimes(settings);
-    const next = getNextPrayer(times);
+    const { next } = getPrayerState(await getSettings());
 
     if (next) {
       const text = next.diffMin <= 60 ? `${next.diffMin}m` : `${Math.floor(next.diffMin / 60)}h`;
@@ -35,52 +56,54 @@ async function updateBadge() {
   }
 }
 
+// Session storage outlives a day, so dedupe ids are scoped to the current date.
+async function notifyOnce(id, dateKey, { title, message }) {
+  const { notified } = await chrome.storage.session.get('notified');
+  const ids = notified?.date === dateKey ? notified.ids : [];
+  if (ids.includes(id)) return;
+
+  await chrome.notifications.create(id, {
+    type: 'basic',
+    iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
+    title,
+    message,
+    priority: 2,
+  });
+  await chrome.storage.session.set({ notified: { date: dateKey, ids: [...ids, id] } });
+}
+
 async function checkNotifications() {
   try {
     const settings = await getSettings();
     if (!settings.notifications) return;
 
-    const times = calcTimes(settings);
-    const next = getNextPrayer(times);
+    const { next, dateKey } = getPrayerState(settings);
+    if (!next || next.name === 'Sunrise') return;
 
-    if (next && next.diffMin <= settings.notifyMinutes) {
-      const { notifiedPrayers = [] } = await chrome.storage.session.get('notifiedPrayers');
-
-      if (!notifiedPrayers.includes(next.name)) {
-        await chrome.notifications.create(`prayer-${next.name}`, {
-          type: 'basic',
-          iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
-          title: `${next.name} in ${next.diffMin} minutes`,
-          message: `Prayer time is approaching. Prepare for ${next.name}.`,
-          priority: 2,
-        });
-
-        await chrome.storage.session.set({
-          notifiedPrayers: [...notifiedPrayers, next.name],
-        });
-      }
+    if (next.diffMin <= settings.notifyMinutes) {
+      await notifyOnce(`prayer-${next.name}`, dateKey, {
+        title: `${next.name} in ${next.diffMin} minutes`,
+        message: `Prayer time is approaching. Prepare for ${next.name}.`,
+      });
     }
 
-    if (next && next.diffMin <= 1) {
-      const { prayedPrayers = [] } = await chrome.storage.session.get('prayedPrayers');
-
-      if (!prayedPrayers.includes(next.name)) {
-        await chrome.notifications.create(`prayer-now-${next.name}`, {
-          type: 'basic',
-          iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
-          title: `${next.name} time`,
-          message: `It is now time for ${next.name} prayer.`,
-          priority: 2,
-        });
-
-        await chrome.storage.session.set({
-          prayedPrayers: [...prayedPrayers, next.name],
-        });
-      }
+    if (next.diffMin <= 1) {
+      await notifyOnce(`prayer-now-${next.name}`, dateKey, {
+        title: `${next.name} time`,
+        message: `It is now time for ${next.name} prayer.`,
+      });
     }
   } catch (err) {
     console.error('Notification check failed:', err);
   }
+}
+
+// Alarms aren't guaranteed to survive a browser restart, so recreate if missing.
+async function start() {
+  if (!(await chrome.alarms.get('prayer-check'))) {
+    await chrome.alarms.create('prayer-check', { periodInMinutes: 1 });
+  }
+  await updateBadge();
 }
 
 chrome.runtime.onInstalled.addListener(async () => {
@@ -88,9 +111,10 @@ chrome.runtime.onInstalled.addListener(async () => {
   if (!settings) {
     await chrome.storage.sync.set({ settings: DEFAULT_SETTINGS });
   }
-  await chrome.alarms.create('prayer-check', { periodInMinutes: 1 });
-  await updateBadge();
+  await start();
 });
+
+chrome.runtime.onStartup.addListener(start);
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'prayer-check') {
@@ -104,9 +128,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     (async () => {
       try {
         const settings = await getSettings();
-        const times = calcTimes(settings);
-        const current = getCurrentPrayer(times);
-        const next = getNextPrayer(times);
+        const { times, current, next } = getPrayerState(settings);
         sendResponse({ times, current, next, settings });
       } catch (err) {
         sendResponse({ error: err.message });
@@ -117,14 +139,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   if (message.type === 'saveSettings') {
     (async () => {
-      await chrome.storage.sync.set({ settings: message.settings });
-      await chrome.storage.session.set({ notifiedPrayers: [], prayedPrayers: [] });
-      await updateBadge();
-      sendResponse({ ok: true });
+      try {
+        await chrome.storage.sync.set({ settings: message.settings });
+        await chrome.storage.session.remove('notified');
+        await updateBadge();
+        sendResponse({ ok: true });
+      } catch (err) {
+        sendResponse({ ok: false, error: err.message });
+      }
     })();
     return true;
   }
 });
-
-const praytime = new PrayTime();
-setupPrayTime(praytime);
