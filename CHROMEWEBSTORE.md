@@ -49,6 +49,7 @@ PERMISSIONS
 SUPPORT
 Found a bug or have a suggestion? Open an issue at
 https://github.com/qsrahman/prayer-times/issues
+or email qsrahmans@gmail.com
 
 Version 0.2.0 — Added a live countdown badge on the toolbar icon, 18 city
 presets, 13 calculation methods, and configurable prayer reminders.
@@ -183,7 +184,7 @@ state to stay consistent with the disclosure form above:
 - No data sold or shared with third parties
 - No cookies, no analytics, no third-party services
 - Users can clear all stored data by clearing extension storage or uninstalling
-- Contact email for privacy questions
+- Contact email for privacy questions: qsrahmans@gmail.com
 
 ⚠️ **A dead or unlisted URL causes automatic submission rejection.** Verify the
 page returns 200 without a login before submitting.
@@ -200,11 +201,11 @@ page returns 200 without a login before submitting.
 Qazi Sami ur Rahman
 
 **Contact Email** [REQUIRED]
-⚠️ TODO — add a real, publicly monitored address. Store submissions are rejected
-if the contact email is invalid or bounces.
+qsrahmans@gmail.com
 
 **Support URL / Email** [RECOMMENDED]
 https://github.com/qsrahman/prayer-times/issues
+qsrahmans@gmail.com
 
 **Homepage URL** [RECOMMENDED]
 https://github.com/qsrahman/prayer-times
@@ -247,8 +248,9 @@ https://github.com/qsrahman/prayer-times
 - [x] `return true` in async `onMessage` listeners
 - [x] No `host_permissions` declared
 - [x] No network calls anywhere in the codebase
+- [x] Privacy policy draft content specified
+- [x] Contact email added (qsrahmans@gmail.com)
 - [ ] Privacy policy URL live and returning 200
-- [ ] Contact email added
 - [ ] At least 1 screenshot at 1280×800 or 640×400
 - [ ] Version number bumped if resubmitting after fixes
 - [ ] ZIP excludes `.git/`, `CHROMEWEBSTORE.md`, and any local files
